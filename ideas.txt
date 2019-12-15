@@ -1,0 +1,4 @@
+/ping - just logistics is running
+/health - good if logistings AND all services you call are doing good
+/test - run test req/resp on each
+
