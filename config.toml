@@ -1,0 +1,2 @@
+[endpoints]
+people = "https://randomuser.me/api/"

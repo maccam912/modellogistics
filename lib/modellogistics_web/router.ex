@@ -11,7 +11,7 @@ defmodule ModellogisticsWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug ModellogisticsWeb.Plugs.StartTimer
+    plug ModellogisticsWeb.Plugs.Logging
   end
 
   scope "/ui", ModellogisticsWeb do
