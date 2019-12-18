@@ -1,5 +1,6 @@
 defmodule ModellogisticsWeb.ServiceController do
   use ModellogisticsWeb, :controller
+  require Logger
 
   defp get_config() do
     {:ok, contents} = File.read("config.toml")
@@ -7,17 +8,35 @@ defmodule ModellogisticsWeb.ServiceController do
     config
   end
 
+  defp start_request(url, _body) do
+    starttime = DateTime.utc_now
+    {:ok, starttime, url, Task.async(fn -> HTTPoison.get(url) end)}
+  end
+
+  defp finish_request(tasktuple) do
+    {:ok, starttime, url, task} = tasktuple
+    {:ok, response} = Task.await(task)
+    endtime = DateTime.utc_now
+    diff = DateTime.diff(endtime, starttime, :microsecond)
+    ms = Float.to_string(diff/1000)
+    Logger.debug(Jason.encode!(%{"url" => url, "elapsed_time" => ms <> " ms", "status_code" => response.status_code}))
+    Jason.decode!(response.body)
+  end
+
   def index(conn, %{"service" => "hello"}) do
     c = get_config()
-    %{"services" => %{"hello" => endpoint_names}} = c
-    endpoints = endpoint_names
-      |> Enum.map(fn name -> c["endpoints"][name] end)
-    responses = endpoints
-      |> Enum.map(fn x -> HTTPoison.get(x) end)
-      |> Enum.map(fn {:ok, %HTTPoison.Response{body: body}} -> Jason.decode(body) end)
-      |> Enum.map(fn {:ok, content} -> content end)
+    %{"services" => %{"hello" => %{"stages" => [stages]}}} = c
+    endpoint_urls = stages
+      |> Enum.map(fn name -> c["endpoints"][name]["url"] <> c["endpoints"][name]["inference"] end)
 
-    combined_response = %{"responses" => responses}
+    responses = endpoint_urls
+      |> Enum.map(fn x -> start_request(x, nil) end)
+      |> Enum.map(fn task -> finish_request(task) end)
+
+    responses_map = Enum.zip(stages, responses)
+      |> Enum.into(%{})
+
+    combined_response = %{"responses" => responses_map}
     {:ok, encoded} = Jason.encode(combined_response)
     text(conn, encoded)
   end

@@ -1,6 +1,12 @@
-[endpoints]
-people = "https://randomuser.me/api"
-yesno = "https://yesno.wtf/api"
+[endpoints.people]
+url = "https://randomuser.me"
+inference = "/api"
+health = "/api"
 
-[services]
-hello = ["yesno", "people"]
+[endpoints.yesno]
+url = "https://yesno.wtf"
+inference = "/api"
+health = "/api"
+
+[services.hello]
+stages = [["people", "yesno"]]

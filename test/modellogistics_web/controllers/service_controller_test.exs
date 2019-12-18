@@ -4,7 +4,7 @@ defmodule ModellogisticsWeb.ServiceControllerTest do
   test "GET /hello", %{conn: conn} do
     conn = get(conn, "/hello")
     response = text_response(conn, 200)
-    %{"responses" => [%{"answer" => yn} | _]} = Jason.decode!(response)
+    {:ok, %{"responses" => %{"yesno" => %{"answer" => yn}}}} = Jason.decode(response)
     assert (yn == "yes") || (yn == "no")
   end
 end
