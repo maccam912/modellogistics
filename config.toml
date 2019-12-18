@@ -1,2 +1,6 @@
 [endpoints]
-people = "https://randomuser.me/api/"
+people = "https://randomuser.me/api"
+yesno = "https://yesno.wtf/api"
+
+[services]
+hello = ["yesno", "people"]

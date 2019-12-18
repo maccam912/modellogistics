@@ -25,5 +25,6 @@ defmodule ModellogisticsWeb.Router do
     pipe_through :api
 
     get "/ping", PingController, :index
+    get "/:service", ServiceController, :index
   end
 end

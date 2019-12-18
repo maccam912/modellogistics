@@ -1,6 +1,5 @@
 defmodule ModellogisticsWeb.PingControllerTest do
   use ModellogisticsWeb.ConnCase
-  import ExUnit.CaptureLog
 
   test "GET /ping", %{conn: conn} do
     conn = get(conn, "/ping")
